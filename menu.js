@@ -169,6 +169,7 @@ const renderDrawingMenu = () => {
   drawingHelp3.textContent = chrome.i18n.getMessage('drawingHelp3');
   fieldContent.appendChild(drawingHelp3);
 
+  // TODO
   // font selector
   // color picker
   // padding

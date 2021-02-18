@@ -1,32 +1,9 @@
 "use strict";
 
-/* TODO list:
- * 3. write ImgWriter canvas functionality properly
- * 4. i18n (ru/en at least) of dictionary (provide proper english translation)
- * 5. i18n (ru/en at lest) of interface
- * 6. math expressions translator
- * 7. 3D font renderer 
- * 8. 9D font renderer
- * 9. tools for block form rules
- * 10. tags! make them work!
- * 11. IDK, user-made entries with JSON import/export for sync storage?
- * 12. also make icon, maybe with "!ih" syllable in glyphic style font
- * 13. make a font editor
- * 14. make a dictionary editor
- * 15. support vector fonts too
-*/
-/*
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  for (let key in changes) {
-    console.log('Storage key "%s" in namespace "%s" changed. Old value was "%s", new value is "%s".',
-      key, namespace, changes[key].oldValue, changes[key].newValue);
-  }
-});
-*/
-
 // Any new dictionaries are added to popup.html as scripts and spread into dict in menu.js
 /* Any new fonts are added to popup.html as scripts,
  * and their "name" property should be added to "fonts" in menu.js
+ *
  * Font table:
  * 0: Hentuktikonerrti
  *
@@ -39,6 +16,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
  * 5: LtR->BtT
  * 6: RtL->TtB
  * 7: RtL->BtT
+ *
  * Spiraling starting point and direction are defined by "direction" property.
 */
 let state = {};

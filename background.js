@@ -37,5 +37,10 @@ const defaultSettings = {
   //width: 320, // TODO no support yet
   height: 320
 };
-chrome.storage.sync.get(['ʇihittuh_settings'], function(result) {state = result.key;});
-if (!state.font) {chrome.storage.sync.set({'ʇihittuh_settings': {...defaultSettings}}); state = {...defaultSettings};}
+chrome.storage.sync.get(['ʇihittuh_settings'], function(result) {
+  state = result.key;
+});
+if (!state.font) {
+  chrome.storage.sync.set({'ʇihittuh_settings': {...defaultSettings}});
+  state = {...defaultSettings};
+}

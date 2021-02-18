@@ -1,22 +1,93 @@
 "use strict";
-const randomId = (add='el') => {
-  return add+'-'+String(Math.floor(Math.random()*999999));
+
+function uniqueId(add = "el") {
+  return `${add}-${Date.now()}`;
 };
+
+function setProp(el, propertyName, propertyValue) {
+  if (typeof propertyValue === "undefined") return;
+  el[propertyName] = propertyValue;
+}
+
 /**
  * Creates DOM element and inserts it into the tree
  * @param {String} [id=el-xxxxxx] - element ID
  * @param {Object} [par=body] - where to append
+ * @param {Object} config - possible properties for element
  * @returns {Object} reference to new element
  */
-const newElement = (id=randomId(),par=document.body) => {
-  let tmp = document.createElement('div');
+function newElement(id = uniqueId(), par = document.body, config) {
+  let tmp = document.createElement(config?.tagName ? config.tagName : 'div');
   tmp.id = id;
+
+  if (config) {
+    setProp(tmp, "type",      config.type);
+    setProp(tmp, "maxlength", config.maxlength);
+    setProp(tmp, "autofocus", config.autofocus);
+    setProp(tmp, "className", config.className);
+    setProp(tmp, "width",     config.width);
+    setProp(tmp, "height",    config.height);
+
+    setProp(tmp, "placeholder", typeof config.placeholder === "undefined"
+      ? undefined
+      : chrome.i18n.getMessage(config.placeholder)
+    );
+    let elTextAppendix = typeof config.textContentAppendix === "undefined"
+          ? "" : config.textContentAppendix,
+        elTextContent = (
+          typeof config.textContentI18n === "undefined"
+            ? (typeof config.textContent === "undefined" ? "" : config.textContent) + elTextAppendix
+            : chrome.i18n.getMessage(config.textContentI18n) + elTextAppendix
+        );
+    setProp(tmp, "textContent", elTextContent);
+
+    if (config.cb) {
+      config.cb.map(cbConfig => {
+        tmp.addEventListener(cbConfig.event, cbConfig.action);
+      });
+    }
+    
+    if (config.style) {
+      config.style.map(styleConfig => {
+        tmp.style[styleConfig.p] = styleConfig.v;
+      });
+    }
+  }
+
   par.appendChild(tmp);
   return tmp;
 };
-const dicts = {en: dict_en, ru: dict_ru};
+
+/**
+ * Creates a clickable button
+ * @param {String} [id=el-xxxxxx] - element ID
+ * @param {Object} [par=body] - where to append
+ * @param {Function} action - what to do upon click
+ * @returns {Object} reference to new element
+ */
+function newButton(id = uniqueId(), par = document.body, action) {
+  return newElement(id, par, {
+    className: "toolsButton", textContentI18n: id,
+    cb: [ {event: "click", action: action} ]
+  });
+}
+
+/**
+ * Removes all children of the passed element
+ * @param {Object} el - which element to purge
+ */
+function purgeElement(el) {
+  //if (el.childNodes.length > 0) {
+  //  for (let entry of el.childNodes()) { entry.remove(); }
+  //}
+  while(el.childNodes.length > 0) el.childNodes[0].remove();
+}
+
+const dicts = {
+  en: dict_en, ru: dict_ru
+};
 let dictLocale = chrome.i18n.getMessage('@@ui_locale');
-if (!dicts[dictLocale]) {dictLocale = 'en';}
+if (!dicts[dictLocale]) dictLocale = 'en';
 const dict = dicts[dictLocale],
       searchDict = [],
       entryList = [],
@@ -25,27 +96,29 @@ const dict = dicts[dictLocale],
 let state = {},
     currentFont = {},
     root, fieldMenu, fieldContent;
-const updateFont = (cb) => {
+
+function updateFont(cb) {
   currentFont = {};
   let length = Object.entries(fonts[state.font].font).length,
       i = 1;
-  for (let [syllable,img] of Object.entries(fonts[state.font].font)) {
+  for (let [syllable, img] of Object.entries(fonts[state.font].font)) {
     currentFont[syllable] = new Image();
     i++;
-    if (i > length) currentFont[syllable].addEventListener('load',cb);
+    if (i > length) currentFont[syllable].addEventListener('load', cb);
     currentFont[syllable].src = img;
   }
 }
-const formSearchDict = () => {
+
+function formSearchDict() {
   for (const [predicate, entries] of Object.entries(dict)) {
-    let entriesCopy = entries.filter(e=>(e[0]!='*' && e[0]!='#' && e[0]!='=' && e[0]!='|'));
+    let entriesCopy = entries.filter(e => (e[0] != '*' && e[0] != '#' && e[0] != '=' && e[0] != '|'));
     searchDict.push([predicate,entriesCopy.join('. ')]);
     entryList.push(predicate);
   }
-  console.log('Dictionary length:',entryList.length);
+  console.log('Dictionary length:', entryList.length);
 };
 
-const filterWordEntries = (isFiltering) => {
+function filterWordEntries(isFiltering) {
   let searchResult = [];
   if (isFiltering) {
     const searchQuery = document.getElementById('searchField').value;
@@ -56,118 +129,92 @@ const filterWordEntries = (isFiltering) => {
   renderEntries(searchResult);
 };
 
-const renderMenu = () => {
-  if (fieldMenu.childNodes.length > 0) for (let entry of fieldMenu.childNodes()) {entry.remove();}
+function renderMenu() {
+  purgeElement(fieldMenu);
 
-  let searchField = document.createElement('input');
-  searchField.type = "search";
-  searchField.id = "searchField";
-  searchField.placeholder = chrome.i18n.getMessage('searchPlaceholder');
-  searchField.maxlength = 20;
-  searchField.autofocus = true;
-  fieldMenu.appendChild(searchField);
+  newElement("searchField", fieldMenu, {
+    tagName: "input",
+    type: "search", placeholder: "searchPlaceholder", maxlength: 20, autofocus: true
+  });
+  newButton("searchButton", fieldMenu, () => { filterWordEntries(true); });
+  newButton("browseButton", fieldMenu, () => { filterWordEntries(false); });
+  newButton("drawingButton", fieldMenu, renderDrawingMenu);
 
-  let searchButton = document.createElement('div');
-  searchButton.id = "searchButton";
-  searchButton.className = "toolsButton";
-  searchButton.textContent = chrome.i18n.getMessage('searchButton');
-  searchButton.addEventListener('click', ()=>{filterWordEntries(true)});
-  document.addEventListener('keydown', function(event){if (event.key=='Enter') filterWordEntries(true);});
-  fieldMenu.appendChild(searchButton);
-
-  let browseButton = document.createElement('div');
-  browseButton.id = "browseButton";
-  browseButton.className = "toolsButton";
-  browseButton.textContent = chrome.i18n.getMessage('browseButton');
-  browseButton.addEventListener('click', ()=>{filterWordEntries(false)});
-  fieldMenu.appendChild(browseButton);
-
-  let drawingButton = document.createElement('div');
-  drawingButton.id = "drawingButton";
-  drawingButton.className = "toolsButton";
-  drawingButton.textContent = chrome.i18n.getMessage('drawingButton');
-  drawingButton.addEventListener('click', renderDrawingMenu);
-  fieldMenu.appendChild(drawingButton);
+  document.addEventListener("keydown", function(event) {
+    if (event.key == "Enter") filterWordEntries(true);
+  });
 };
 
-const renderCustomText = (syllables=document.getElementById('textToDraw').value.split(' '), dir=state.direction, customTarget) => {
-  let currentRow = 1,
-      currentColumn = 1,
-      currentX = 0,
-      currentY = 0,
-      tempX = 0,
-      tempY = 0,
+function renderCustomText(
+  syllables = document.getElementById("textToDraw").value.split(" "),
+  dir = state.direction,
+  customTarget
+) {
+  let currentRow = 1, currentColumn = 1,
+      currentX = 0, currentY = 0,
+      tempX = 0, tempY = 0,
       drawingCanvas;
   if (customTarget) {
-    drawingCanvas = document.createElement('canvas');
-    drawingCanvas.id = randomId('drawingCanvas');
+    drawingCanvas = document.createElement("canvas");
+    drawingCanvas.id = uniqueId("drawingCanvas");
     customTarget.appendChild(drawingCanvas);
     for (let s of syllables) {
       let ratio = currentFont[s].width / (customTarget ? dictFontSize : state.size);
-      tempY += (customTarget ? dictFontSize : state.size)/9 + currentFont[s].height/ratio;
+      tempY += (customTarget ? dictFontSize : state.size) / 9 + currentFont[s].height / ratio;
     }
     tempY = Math.ceil(tempY);
-  } else drawingCanvas = document.getElementById('drawingCanvas');
+  } else drawingCanvas = document.getElementById("drawingCanvas");
   const freespace = customTarget ? 2 : state.freespace,
-        //rows = customTarget ? 1 : state.rows,
+        // rows = customTarget ? 1 : state.rows,
         columns = customTarget ? 1 : state.columns,
         letterWidth = customTarget ? dictFontSize : state.size,
-        //letterHeight = customTarget ? dictFontSize : state.size,
-        canvasWidth = columns * letterWidth + freespace*2,
-        canvasHeight = customTarget ? tempY : state.height + freespace*2;
+        // letterHeight = customTarget ? dictFontSize : state.size,
+        canvasWidth = columns * letterWidth + freespace * 2,
+        canvasHeight = customTarget ? tempY : state.height + freespace * 2;
   drawingCanvas.width = canvasWidth;
   drawingCanvas.height = canvasHeight;
-  let ctx = drawingCanvas.getContext('2d');
-  ctx.clearRect(0,0,canvasWidth,canvasHeight);
+  let ctx = drawingCanvas.getContext("2d");
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   ctx.imageSmoothingEnabled = state.smoothing;
 
-  const print = (syllable,x,y,ratio) => {
-    ctx.drawImage(currentFont[syllable],
-      x,
-      y,
+  const print = (syllable, x, y, ratio) => {
+    ctx.drawImage(
+      currentFont[syllable],
+      x, y,
       currentFont[syllable].width/ratio,
-      currentFont[syllable].height/ratio);
+      currentFont[syllable].height/ratio
+    );
   };
 
-  tempY = freespace - letterWidth/9;
+  tempY = freespace - letterWidth / 9;
   tempX = freespace + letterWidth;
   for (let s of syllables) {
     let ratio = currentFont[s].width / (customTarget ? dictFontSize : state.size);
-    tempY += letterWidth/9 + currentFont[s].height/ratio;
+    tempY += letterWidth / 9 + currentFont[s].height / ratio;
     if (tempY > canvasHeight) {
-      tempY = freespace + currentFont[s].height/ratio;
-      tempX += letterWidth/9 + letterWidth;
+      tempY = freespace + currentFont[s].height / ratio;
+      tempX += letterWidth / 9 + letterWidth;
     }
-    print(s,
+    print(
+      s,
       canvasWidth - tempX,
       canvasHeight - tempY,
-      ratio);
+      ratio
+    );
   }
 
-  ctx.globalCompositeOperation = 'source-in';
+  ctx.globalCompositeOperation = "source-in";
   ctx.fillStyle = state.color;
-  ctx.fillRect(0,0,canvasWidth,canvasHeight);
-  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.globalCompositeOperation = "source-over";
 };
 
-const renderDrawingMenu = () => {
-  while (fieldContent.firstChild) { fieldContent.removeChild(fieldContent.firstChild); }
+function renderDrawingMenu() {
+  purgeElement(fieldContent);
 
-  let drawingHelp1 = document.createElement('div');
-  drawingHelp1.id = randomId('drawingHelp1');
-  drawingHelp1.className = "drawingHelp";
-  drawingHelp1.textContent = chrome.i18n.getMessage('drawingHelp1');
-  fieldContent.appendChild(drawingHelp1);
-  let drawingHelp2 = document.createElement('div');
-  drawingHelp2.id = randomId('drawingHelp2');
-  drawingHelp2.className = "drawingHelp";
-  drawingHelp2.textContent = chrome.i18n.getMessage('drawingHelp2');
-  fieldContent.appendChild(drawingHelp2);
-  let drawingHelp3 = document.createElement('div');
-  drawingHelp3.id = randomId('drawingHelp3');
-  drawingHelp3.className = "drawingHelp";
-  drawingHelp3.textContent = chrome.i18n.getMessage('drawingHelp3');
-  fieldContent.appendChild(drawingHelp3);
+  newElement("drawingHelp1", fieldContent, { className: "drawingHelp", textContentI18n: "drawingHelp1" });
+  newElement("drawingHelp2", fieldContent, { className: "drawingHelp", textContentI18n: "drawingHelp2" });
+  newElement("drawingHelp3", fieldContent, { className: "drawingHelp", textContentI18n: "drawingHelp3" });
 
   // TODO
   // font selector
@@ -183,109 +230,75 @@ const renderDrawingMenu = () => {
   // boustrophedon bool
   // spiraling bool
 
-  let textToDraw = document.createElement('input');
-  textToDraw.type = "text";
-  textToDraw.id = "textToDraw";
-  textToDraw.placeholder = chrome.i18n.getMessage('drawTextPlaceholder');
-  textToDraw.maxlength = 900;
-  fieldContent.appendChild(textToDraw);
+  newElement("textToDraw", fieldContent, {
+    tagName: "input", type: "text", placeholder: "drawTextPlaceholder", maxlength: 900
+  });
 
   // fonts[state.font].name + 
   //' for ' + fonts[state.font].style +
   //' style of ' + fonts[state.font].lang +
   //' language (artist: '+ fonts[state.font].artist + ')'
-
-  let drawButton = document.createElement('div');
-  drawButton.id = "drawButton";
-  drawButton.className = "toolsButton";
-  drawButton.textContent = chrome.i18n.getMessage('drawButton');
-  drawButton.addEventListener('click', ()=>{
+  newButton("drawButton", fieldContent, () => {
     // TODO update sync storage and local state
-    updateFont(()=>{renderCustomText()}); // TODO should call that in the callback of the update
+    updateFont(() => { renderCustomText(); }); // TODO should call that in the callback of the update
   });
-  fieldContent.appendChild(drawButton);
-
-  let drawingCanvas = document.createElement('canvas');
-  drawingCanvas.id = 'drawingCanvas';
-  drawingCanvas.width = 480;
-  drawingCanvas.height = 1;
-  fieldContent.appendChild(drawingCanvas);
+  newElement("drawingCanvas", fieldContent, { tagName: "canvas", width: 480, height: 1 });
 };
 
-const renderEntries = (entries) => {
-  updateFont(()=>{
-    while (fieldContent.firstChild) { fieldContent.removeChild(fieldContent.firstChild); }
+function renderEntries(entries) {
+  updateFont( () => {
+    purgeElement(fieldContent);
     for (const predicate of entries) {
       let entry = dict[predicate],
           spreadPredicate = '';
 
-      let entrySection = document.createElement('div');
-      entrySection.id = randomId('entry');
-      entrySection.className = "entry";
-      fieldContent.appendChild(entrySection);
+      let entrySection = newElement(uniqueId("entry"), fieldContent, {className: "entry"}),
+          entryText = newElement(uniqueId("entryText"), entrySection, {className: "entryText"}),
+          predicateDrawing = newElement(uniqueId("predicateDrawing"), entrySection, {className: "predicateDrawing"}),
+          predicateName = newElement(uniqueId("predicateName"), entryText, {
+            className: "predicateName", textContent: predicate
+          });
 
-      let entryText = document.createElement('div');
-      entryText.id = randomId('entryText');
-      entryText.className = "entryText";
-      entrySection.appendChild(entryText);
-
-      // predicate entries themselves
-      let predicateDrawing = document.createElement('div');
-      predicateDrawing.id = randomId('predicateDrawing');
-      predicateDrawing.className = "predicateDrawing";
-      entrySection.appendChild(predicateDrawing);
-
-      let predicateName = document.createElement('div');
-      predicateName.id = randomId('predicateName');
-      predicateName.className = "predicateName";
-      predicateName.textContent = predicate;
-      entryText.appendChild(predicateName);
       for (const e of entry) {
         switch (e[0]) {
-          case '=':
+          case "=":
             break;
-          case '*':
-            let predicateParent = document.createElement('div');
-            predicateParent.id = randomId('predicateParent');
-            predicateParent.className = "predicateParent";
-            predicateParent.textContent = chrome.i18n.getMessage('parentPredicate') + ' ' + e.slice(1);
-            entryText.appendChild(predicateParent);
+          case "*":
+            newElement(uniqueId("predicateParent"), entryText, {
+              className: "predicateParent", textContentI18n: "parentPredicate",
+              textContentAppendix: " " + e.slice(1)
+            });
             break;
-          case '#':
-            let predicateColor = document.createElement('div');
-            predicateColor.id = randomId('predicateColor');
-            predicateColor.className = "predicateColor";
-            predicateColor.textContent = e;
-            predicateColor.style.backgroundColor = e;
-            entryText.appendChild(predicateColor);
+          case "#":
+            newElement(uniqueId("predicateColor"), entryText, {
+              className: "predicateColor", textContent: e, style: [ {p: "backgroundColor", v: e} ]
+            });
             break;
-          case '|':
+          case "|":
             spreadPredicate = e.slice(1);
             break;
           default:
-            let predicateMeaning = document.createElement('div');
-            predicateMeaning.id = randomId('predicateMeaning');
-            predicateMeaning.className = "predicateMeaning";
-            predicateMeaning.textContent = '* ' + e;
-            entryText.appendChild(predicateMeaning);
+            newElement(uniqueId("predicateMeaning"), entryText, {
+              className: "predicateMeaning", textContent: "* " + e
+            });
             break;
         }
       }
-      renderCustomText(spreadPredicate.split(' '),4,predicateDrawing);
+      renderCustomText(spreadPredicate.split(" "), 4, predicateDrawing);
     }
   });
 };
 
 const init = () => {
-  chrome.storage.sync.get(['ʇihittuh_settings'], function(result) {
-    state = result['ʇihittuh_settings'];
+  chrome.storage.sync.get(["ʇihittuh_settings"], function(result) {
+    state = result["ʇihittuh_settings"];
     formSearchDict();
-    root = document.getElementById('toolsRoot');
-    fieldMenu = newElement('fieldMenu',root);
-    fieldContent = newElement('fieldContent',root);
+    root = document.getElementById("toolsRoot");
+    fieldMenu = newElement("fieldMenu", root);
+    fieldContent = newElement("fieldContent", root);
     renderMenu();
     filterWordEntries(false);
   });
 };
 
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener("DOMContentLoaded", init);

@@ -1,0 +1,58 @@
+{
+  "extName": {
+    "message": "ʇihittuh tools",
+    "description": "Name of the extension"
+  },
+  "extDescription": {
+    "message": "A number of tools for ʇihittuh conlang (constructed language), such as dictionary with search and customizable rendering of texts with fonts unique for this conlang.",
+    "description": "Description of the extension"
+  },
+  "searchPlaceholder": {
+    "message": "Search in dictionary...",
+    "description": "Placeholder in the search field of the dictionary"
+  },
+  "searchButton": {
+    "message": "Search",
+    "description": "Caption on the search button"
+  },
+  "browseButton": {
+    "message": "Browse predicate entries",
+    "description": "Caption on the button which allows to browse word entries manually"
+  },
+  "drawingButton": {
+    "message": "Show drawing menu",
+    "description": "Caption on the button which shows drawing settings"
+  },
+  "fieldStatusReady": {
+    "message": "Ready!",
+    "description": "Caption on the status field, showing that the extension is ready"
+  },
+  "fieldStatusBusy": {
+    "message": "Busy...",
+    "description": "Caption on the status field, showing that the extension is busy doing something"
+  },
+  "parentPredicate": {
+    "message": "Parent predicate:",
+    "description": "Caption shown before parent predicate in word entry"
+  },
+  "drawingHelp1": {
+    "message": "Example of how you should enter the text you wish to draw:",
+    "description": "First row of help showing on the custom drawing screen"
+  },
+  "drawingHelp2": {
+    "message": "''fisust kut fukh thi fʇsuifsʇhus hut'' becomes",
+    "description": "Second row of help showing on the custom drawing screen"
+  },
+  "drawingHelp3": {
+    "message": "''fis ust kut fu kh thi f! su if s! hus hut''",
+    "description": "Third row of help showing on the custom drawing screen"
+  },
+  "drawButton": {
+    "message": "Draw",
+    "description": "Caption on the button which triggers the custom drawing"
+  },
+  "drawTextPlaceholder": {
+    "message": "Text to draw",
+    "description": "Placeholder in the input field for custom text drawing"
+  }
+}

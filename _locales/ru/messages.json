@@ -1,0 +1,58 @@
+{
+  "extName": {
+    "message": "Инструменты ҵихиттух",
+    "description": "Name of the extension"
+  },
+  "extDescription": {
+    "message": "Различные инструменты для конланга (искусственного языка) ҵихиттух, в том числе: словарь с поиском и гибко настраиваемую отрисовку текстов различными шрифтами, специфичными для письменности данного языка.",
+    "description": "Description of the extension"
+  },
+  "searchPlaceholder": {
+    "message": "Искать в словаре...",
+    "description": "Placeholder in the search field of the dictionary"
+  },
+  "searchButton": {
+    "message": "Поиск",
+    "description": "Caption on the search button"
+  },
+  "browseButton": {
+    "message": "Просмотреть статьи предикатов",
+    "description": "Caption on the button which allows to browse word entries manually"
+  },
+  "drawingButton": {
+    "message": "Показать меню рисования",
+    "description": "Caption on the button which shows drawing settings"
+  },
+  "fieldStatusReady": {
+    "message": "Готово!",
+    "description": "Caption on the status field, showing that the extension is ready"
+  },
+  "fieldStatusBusy": {
+    "message": "Занято...",
+    "description": "Caption on the status field, showing that the extension is busy doing something"
+  },
+  "parentPredicate": {
+    "message": "Родительский предикат:",
+    "description": "Caption shown before parent predicate in word entry"
+  },
+  "drawingHelp1": {
+    "message": "Пример того, как нужно вводить текст, который нужно нарисовать:",
+    "description": "First row of help showing on the custom drawing screen"
+  },
+  "drawingHelp2": {
+    "message": "''фисуст кут фукх тхи фҵсуифсҵхус хут'' становится",
+    "description": "Second row of help showing on the custom drawing screen"
+  },
+  "drawingHelp3": {
+    "message": "''fis ust kut fu kh thi f! su if s! hus hut''",
+    "description": "Third row of help showing on the custom drawing screen"
+  },
+  "drawButton": {
+    "message": "Отрисовать",
+    "description": "Caption on the button which triggers the custom drawing"
+  },
+  "drawTextPlaceholder": {
+    "message": "Текст для отрисовки",
+    "description": "Placeholder in the input field for custom text drawing"
+  }
+}

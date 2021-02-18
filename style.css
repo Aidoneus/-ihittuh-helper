@@ -1,0 +1,95 @@
+body {
+  background-color: #333;
+  font-size: 12px;
+  font-family: sans-serif;
+  color: #eee;
+  margin: 0;
+}
+* {}
+#toolsRoot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 480px;
+}
+#fieldMenu {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+#fieldContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 500px;
+  overflow: auto;
+}
+#searchField {display: inline-flex; width: 73%;}
+#searchButton {display: inline-flex; width: 25%;}
+#browseButton {display: inline-flex; width: 57%;}
+#drawingButton {display: inline-flex; width: 40%;}
+.toolsButton {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  cursor: default;
+  transition: border-color .3s, background-color .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #999;
+  border-radius: 2px;
+  background-color: #666;
+  height: 18px;
+  margin: 0 1px;
+}
+.toolsButton:hover {
+  border-color: #666;
+  background-color: #999;
+}
+
+.entry {
+  display: inline-flex;
+  width: 100%;
+  padding: 4px 0;
+  border-bottom: 2px solid #111;
+}
+.entryText {
+  width: 90%;
+  padding-left: 6px;
+}
+.predicateDrawing {
+  width: fit-content;
+  height: fit-content;
+  background-color: #666;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+}
+.predicateName {
+  color: 999;
+  font-weight: bold;
+  padding-left: 16px;
+}
+.predicateParent {}
+.predicateColor {
+  border-radius: 5px;
+  padding: 0 5px;
+  width: calc(50% - 10px);
+  text-shadow: #333 -1px 0 0, #333 1px 0 0, #333 0 -1px 0, #333 0 1px 0;
+}
+.predicateMeaning {}
+
+#textToDraw {display: inline-flex; width: 98%;}
+#drawButton {display: inline-flex; width: 99%;}
+#drawingCanvas {
+  border: 1px solid #aaa;
+}
+.drawingHelp {
+  width: 90%;
+  padding-left: 6px;
+}

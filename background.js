@@ -35,7 +35,9 @@ const defaultSettings = {
   columns: 9, 
   //rows: 12, // TODO no support yet
   //width: 320, // TODO no support yet
-  height: 320
+  height: 320,
+
+  lastQuery: '',
 };
 chrome.storage.sync.get(['ʇihittuh_settings'], function(result) {
   state = result.key;

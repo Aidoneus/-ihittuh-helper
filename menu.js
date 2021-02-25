@@ -2,7 +2,7 @@
 
 function uniqueId(add = "el") {
   return `${add}-${Date.now()}`;
-};
+}
 
 function setProp(el, propertyName, propertyValue) {
   if (typeof propertyValue === "undefined") return;
@@ -27,6 +27,7 @@ function newElement(id = uniqueId(), par = document.body, config) {
     setProp(tmp, "className", config.className);
     setProp(tmp, "width",     config.width);
     setProp(tmp, "height",    config.height);
+    setProp(tmp, "value",     config.value);
 
     setProp(tmp, "placeholder", typeof config.placeholder === "undefined"
       ? undefined
@@ -56,7 +57,7 @@ function newElement(id = uniqueId(), par = document.body, config) {
 
   par.appendChild(tmp);
   return tmp;
-};
+}
 
 /**
  * Creates a clickable button
@@ -116,25 +117,26 @@ function formSearchDict() {
     entryList.push(predicate);
   }
   console.log('Dictionary length:', entryList.length);
-};
+}
 
 function filterWordEntries(isFiltering) {
   let searchResult = [];
   if (isFiltering) {
     const searchQuery = document.getElementById('searchField').value;
+    updateStorage({lastQuery: searchQuery});
     for (const [predicate, entries] of searchDict) {
       if (entries.includes(searchQuery)) searchResult.push(predicate);
     }
   } else searchResult = entryList.slice();
   renderEntries(searchResult);
-};
+}
 
 function renderMenu() {
   purgeElement(fieldMenu);
 
   newElement("searchField", fieldMenu, {
-    tagName: "input",
-    type: "search", placeholder: "searchPlaceholder", maxlength: 20, autofocus: true
+    tagName: "input", type: "search",
+    placeholder: "searchPlaceholder", maxlength: 20, autofocus: true, value: state.lastQuery,
   });
   newButton("searchButton", fieldMenu, () => { filterWordEntries(true); });
   newButton("browseButton", fieldMenu, () => { filterWordEntries(false); });
@@ -143,7 +145,7 @@ function renderMenu() {
   document.addEventListener("keydown", function(event) {
     if (event.key == "Enter") filterWordEntries(true);
   });
-};
+}
 
 function renderCustomText(
   syllables = document.getElementById("textToDraw").value.split(" "),
@@ -207,7 +209,7 @@ function renderCustomText(
   ctx.fillStyle = state.color;
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   ctx.globalCompositeOperation = "source-over";
-};
+}
 
 function renderDrawingMenu() {
   purgeElement(fieldContent);
@@ -239,11 +241,11 @@ function renderDrawingMenu() {
   //' style of ' + fonts[state.font].lang +
   //' language (artist: '+ fonts[state.font].artist + ')'
   newButton("drawButton", fieldContent, () => {
-    // TODO update sync storage and local state
+    // TODO update sync storage and local state through updateStorage(o)
     updateFont(() => { renderCustomText(); }); // TODO should call that in the callback of the update
   });
   newElement("drawingCanvas", fieldContent, { tagName: "canvas", width: 480, height: 1 });
-};
+}
 
 function renderEntries(entries) {
   updateFont( () => {
@@ -287,9 +289,17 @@ function renderEntries(entries) {
       renderCustomText(spreadPredicate.split(" "), 4, predicateDrawing);
     }
   });
-};
+}
 
-const init = () => {
+function updateStorage(o) {
+  let newStorage = {};
+  Object.assign(newStorage, state);
+  Object.assign(newStorage, o);
+  chrome.storage.sync.set({'ʇihittuh_settings': newStorage});
+  state = newStorage;
+}
+
+function init() {
   chrome.storage.sync.get(["ʇihittuh_settings"], function(result) {
     state = result["ʇihittuh_settings"];
     formSearchDict();
@@ -297,8 +307,8 @@ const init = () => {
     fieldMenu = newElement("fieldMenu", root);
     fieldContent = newElement("fieldContent", root);
     renderMenu();
-    filterWordEntries(false);
+    filterWordEntries(true);
   });
-};
+}
 
 document.addEventListener("DOMContentLoaded", init);

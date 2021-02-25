@@ -228,7 +228,7 @@ const dict_en = {
   "ifʇustipiʇʇsu": ['|if !us ti pi !! su','*ifhus kut ʇustipiʇʇsuts','обитатель верха, небожитель','лётчик'],
   "ifpʇkif": ['|if p! kif','*ifhus kut pʇkifts','говорящий загадками, не выражающийся ясно','хитрец, лукавец','демон, дьявол, сатана'],
   "ifpu": ['|if pu','*ifhus kut puts','мудрец','волевое существо','божественная сущность'],
-  "ifputuh": ['|if pu tuh','*ifpust kut tuhkh','речь мудрого','божественное откровение'],
+  "ifputuh": ['|if pu tuh','*ifpuhus kut tuhkh','речь мудрого','божественное откровение'],
   "iftihfistihkuftihpʇ": ['|if tih fis tih kuf tih p!','*ifhus kut tihts thi fistihust kut kuftihpʇkh','сердце или аналогичный орган, перекачивающий кровь или аналогичную жидкость'],
   "iftuʇtuh": ['|if tu! tuh','*ifhus kut tuʇtuhkh','судья','делающий выводы из законов'],
   "iftuftih": ['|if tuf tih','*ifhus kut tuftihts','человек (раса)','делящий материальное'],

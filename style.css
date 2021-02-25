@@ -5,7 +5,6 @@ body {
   color: #eee;
   margin: 0;
 }
-* {}
 #toolsRoot {
   display: flex;
   align-items: center;
@@ -25,10 +24,11 @@ body {
   max-height: 500px;
   overflow: auto;
 }
-#searchField {display: inline-flex; width: 73%;}
-#searchButton {display: inline-flex; width: 25%;}
-#browseButton {display: inline-flex; width: 57%;}
-#drawingButton {display: inline-flex; width: 40%;}
+#searchField { display: inline-flex; width: 73%; }
+#searchButton { display: inline-flex; width: 25%; }
+#rulesButton { display: inline-flex; width: 30%; }
+#browseButton { display: inline-flex; width: 36%; }
+#drawingButton { display: inline-flex; width: 30%; }
 .toolsButton {
   user-select: none;
   -moz-user-select: none;
@@ -45,10 +45,7 @@ body {
   height: 18px;
   margin: 0 1px;
 }
-.toolsButton:hover {
-  border-color: #666;
-  background-color: #999;
-}
+.toolsButton:hover { border-color: #666; background-color: #999; }
 
 .entry {
   display: inline-flex;
@@ -56,10 +53,7 @@ body {
   padding: 4px 0;
   border-bottom: 2px solid #111;
 }
-.entryText {
-  width: 90%;
-  padding-left: 6px;
-}
+.entryText { width: 90%; padding-left: 6px; }
 .predicateDrawing {
   width: fit-content;
   height: fit-content;
@@ -84,12 +78,8 @@ body {
 }
 .predicateMeaning {}
 
-#textToDraw {display: inline-flex; width: 98%;}
-#drawButton {display: inline-flex; width: 99%;}
-#drawingCanvas {
-  border: 1px solid #aaa;
-}
-.drawingHelp {
-  width: 90%;
-  padding-left: 6px;
-}
+#textToDraw { display: inline-flex; width: 98%; }
+#drawButton { display: inline-flex; width: 99%; }
+#drawingCanvas { border: 1px solid #aaa; }
+.drawingHelp { width: 90%; padding-left: 6px; margin: 4px 0; }
+.languageRules { width: 97%; padding-left: 6px; margin: 4px 0; text-align: justify; }

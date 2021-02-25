@@ -139,6 +139,7 @@ function renderMenu() {
     placeholder: "searchPlaceholder", maxlength: 20, autofocus: true, value: state.lastQuery,
   });
   newButton("searchButton", fieldMenu, () => { filterWordEntries(true); });
+  newButton("rulesButton", fieldMenu, renderRulesMenu);
   newButton("browseButton", fieldMenu, () => { filterWordEntries(false); });
   newButton("drawingButton", fieldMenu, renderDrawingMenu);
 
@@ -245,6 +246,14 @@ function renderDrawingMenu() {
     updateFont(() => { renderCustomText(); }); // TODO should call that in the callback of the update
   });
   newElement("drawingCanvas", fieldContent, { tagName: "canvas", width: 480, height: 1 });
+}
+
+function renderRulesMenu() {
+  purgeElement(fieldContent);
+
+  for (let i = 1; i <= 29; i++) {
+    newElement(`languageRules${i}`, fieldContent, { className: "languageRules", textContentI18n: `languageRules${i}` });
+  }
 }
 
 function renderEntries(entries) {

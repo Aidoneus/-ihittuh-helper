@@ -4,7 +4,7 @@
     "description": "Name of the extension"
   },
   "extDescription": {
-    "message": "A number of tools for ʇihittuh conlang (constructed language), such as dictionary with search and customizable rendering of texts with fonts unique for this conlang.",
+    "message": "A number of tools for ʇihittuh conlang, such as: dictionary with search, rules overview, customizable text render with unique fonts.",
     "description": "Description of the extension"
   },
   "searchPlaceholder": {
